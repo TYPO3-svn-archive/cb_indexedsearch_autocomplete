@@ -47,7 +47,7 @@ class tx_cb_indexedsearch_autocomplete_pi1 {
 			
 
     /**
-     * Add the Js and stylesheet
+     * Add the JS and stylesheet
      */
     function main($on_search_page = 0) {
 
