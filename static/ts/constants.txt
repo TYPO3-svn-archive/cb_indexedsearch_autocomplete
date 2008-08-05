@@ -1,0 +1,2 @@
+# cat=indexsearch_autocomplete-basic/other/a; type=options[No=0,Yes=1]; label=Use jQuery noConflict method:If you have conflict with other extensions using JavaScript Framework e.g. Mootools, switch this to on.
+noConflictMethod = 0

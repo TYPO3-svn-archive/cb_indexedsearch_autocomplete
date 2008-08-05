@@ -47,12 +47,16 @@ class tx_cb_indexedsearch_autocomplete_pi1 {
 			
 
     /**
-     * Add the JS and stylesheet
+     * Add the Js and stylesheet
      */
     function main($on_search_page = 0) {
 
 			$this->key = 'cb_indexedsearch_autocomplete';
+			
+			// Should we run into jQuery noConflict Method ? 
+			$noConflictMethod = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['noConflictMethod']);
 
+			
 			// Do we need this at all pages?
 			$onlySearchPage = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['onlySearchPage']);
 			
@@ -66,7 +70,12 @@ class tx_cb_indexedsearch_autocomplete_pi1 {
 			if($GLOBALS[$this->key] != 1) {
 
 				// Include JS
-				$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.js"></script>';
+				if($noConflictMethod==1) {
+					$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete_noconflict.js"></script>';
+				} else {
+					$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.js"></script>';
+
+				}
 
 				// Include CSS
 				$head .= "\n" . '<link rel="stylesheet" type="text/css" href="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.css" />';

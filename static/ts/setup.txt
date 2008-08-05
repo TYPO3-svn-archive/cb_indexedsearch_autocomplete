@@ -1,6 +1,7 @@
 plugin.cb_indexedsearch_autocomplete {
 	maxResults = 10
 	onlySearchPage = 0
+	noConflictMethod = {$noConflictMethod}
 }
 
 includeLibs.cb_indexedsearch_autocomplete = EXT:cb_indexedsearch_autocomplete/pi1/class.tx_cb_indexedsearch_autocomplete_pi1.php
