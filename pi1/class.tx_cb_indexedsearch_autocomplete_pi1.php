@@ -52,11 +52,26 @@ class tx_cb_indexedsearch_autocomplete_pi1 {
     function main($on_search_page = 0) {
 
 			$this->key = 'cb_indexedsearch_autocomplete';
-			
-			// Should we run into jQuery noConflict Method ? 
+
+			// alternative labels (waiting for real i18n support)
+			$altResultLabel = str_replace("'", "", $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['altResultLabel']);
+			$altResultsLabel = str_replace("'", "", $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['altResultsLabel']);
+
+			// Should we auto-submit the search form?
+			$autoSubmit = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['autoSubmit']);
+
+			// Which jQuery library should be loaded?
+			$jQueryFile = $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['jQueryFile'];
+
+			// Is jQuery already loaded externally?
+			$jQueryLoadedExternally = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['jQueryLoadedExternally']);
+
+			// Should we limit the result to a number of suggestions?
+			$maxResults = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['maxResults']);
+
+			// Should we run into jQuery noConflict Method? 
 			$noConflictMethod = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['noConflictMethod']);
 
-			
 			// Do we need this at all pages?
 			$onlySearchPage = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['onlySearchPage']);
 			
@@ -70,18 +85,31 @@ class tx_cb_indexedsearch_autocomplete_pi1 {
 			if($GLOBALS[$this->key] != 1) {
 
 				// Include JS
-				if($noConflictMethod==1) {
-					$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete_noconflict.js"></script>';
-				} else {
-					$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.js"></script>';
-
+				if ($jQueryLoadedExternally === 0)
+				{
+					$jquery_filepath = str_replace('EXT:cb_indexedsearch_autocomplete/', t3lib_extMgm::siteRelPath($this->key), $jQueryFile);
+					$head .= "\n" . '<script type="text/javascript" src="' . $jquery_filepath . '"></script>';
 				}
+				$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.js"></script>';
 
 				// Include CSS
 				$head .= "\n" . '<link rel="stylesheet" type="text/css" href="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.css" />';
 
 				// Make rootpage global as we dont have it when we 'eId'. People can tamper with it client side, so we hash it, making it a little harder for them. It does not mean much they will not get access to more pages than they should anyways
-				$head .= "\n" . '<script type="text/javascript">var sr=' . intval($GLOBALS['TSFE']->config['rootLine'][0]['uid']) . ';var sh="' . t3lib_div::md5int($GLOBALS['TSFE']->config['rootLine'][0]['uid'] . $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey']) . '";</script>'; // ;-)
+				$head .= "\n" . '<script type="text/javascript">' . "\n";
+				if ($noConflictMethod > 0)
+				{
+					$head .= "	jQuery.noConflict();\n";
+
+				}
+				$head .= '	var sr=' . intval($GLOBALS['TSFE']->config['rootLine'][0]['uid']) . ';var sh="' . t3lib_div::md5int($GLOBALS['TSFE']->config['rootLine'][0]['uid'] . $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey']) . '";' . "\n";
+				$head .= "	var cb_indexsearch_autocomplete = {\n";
+				$head .= "		altResultLabel: '$altResultLabel',\n";
+				$head .= "		altResultsLabel: '$altResultsLabel',\n";
+				$head .= "		autoSubmit: $autoSubmit,\n";
+				$head .= "		maxResults: $maxResults\n";
+				$head .= "	};\n";
+				$head .= "</script>\n";
 	
 				$GLOBALS['TSFE']->additionalHeaderData['tx_cb_indexedsearch_autocomplete_pi1'] = $head;
 				
