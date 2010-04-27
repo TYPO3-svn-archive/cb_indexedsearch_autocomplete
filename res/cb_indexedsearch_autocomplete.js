@@ -5,7 +5,7 @@ jQuery.indexedsearchAutocomplete = function(input, options) {
 	var me = this;
 
 	// Create jQuery object for input element
-	var $input = jQuery(input).attr("autocomplete", "off");;
+	var $input = jQuery(input).attr("autocomplete", "off");
 
 	// Apply inputClass if necessary
 	if (options.inputClass) $input.addClass(options.inputClass);
@@ -18,7 +18,7 @@ jQuery.indexedsearchAutocomplete = function(input, options) {
 	var pos = findPos(input);
 
 	options.mustMatch = options.mustMatch || 0;
-	
+
 	$results.hide().addClass(options.resultsClass).css({
 		position: "absolute",
 		top: (pos.y + input.offsetHeight) + "px",
@@ -27,6 +27,7 @@ jQuery.indexedsearchAutocomplete = function(input, options) {
 	
 	// Lets see if we can find it
 	var readWidth = parseInt(jQuery("input[name='tx_indexedsearch[sword]']").get(0).clientWidth);
+
 	if(readWidth > 0) {
 		$results.css({
 				width: readWidth + "px"
@@ -172,7 +173,12 @@ jQuery.indexedsearchAutocomplete = function(input, options) {
 				// we put a styled iframe behind the calendar so HTML SELECT elements don't show through
 				$results.append(document.createElement('iframe'));
 			}
-			results.appendChild(dataToDom(data));
+			var resultList = dataToDom(data);
+			results.appendChild(resultList);
+			if (options.extensionConfig.autoResize)
+			{
+				resetSize(resultList);
+			}
 			$results.show();
 		} else {
 			hideResultsNow();
@@ -204,25 +210,26 @@ jQuery.indexedsearchAutocomplete = function(input, options) {
 			var row = data[i];
 			if (!row) continue;
 
-			if (typeof cb_indexsearch_autocomplete !== 'undefined' && typeof cb_indexsearch_autocomplete.maxResults !== 'undefined')
+			if (i >= options.extensionConfig.maxResults)
 			{
-				if (i >= cb_indexsearch_autocomplete.maxResults)
-				{
-					break;
-				}
+				break;
 			}
+
 			var li = document.createElement("li");
-			li.innerHTML = formatItem(row, i, num);
+			li.title = formatItem(row, i, num);
+			li.innerHTML = li.title;
 			li.selectValue = row[0];
 			var extra = null;
 			if (row.length > 1) {
 				extra = [];
 				for (var j=1; j < row.length; j++) {
-					extra[extra.length] = row[j];
+					extra.push(row[j]);
 				}
 			}
 			li.extra = extra;
 			ul.appendChild(li);
+
+			jQuery(li).addClass(i%2 === 0 ? 'even' : 'odd');
 			jQuery(li).hover(
 				function() { jQuery("li", ul).removeClass("over"); jQuery(this).addClass("over"); },
 				function() { jQuery(this).removeClass("over"); }
@@ -230,6 +237,17 @@ jQuery.indexedsearchAutocomplete = function(input, options) {
 		}
 		return ul;
 	};
+
+	function resetSize(ul)
+	{
+		var tempList = ul.cloneNode(true);
+		jQuery(tempList).css('display', 'none');
+		jQuery("body").get(0).appendChild(tempList);
+		var widthNeeded = jQuery(tempList).width();
+		jQuery("body").get(0).removeChild(tempList);
+		jQuery(ul).width(widthNeeded);
+		$results.width(widthNeeded);
+	}
 
 	function requestData(q) {
 		if (!options.matchCase) q = q.toLowerCase();
@@ -324,20 +342,16 @@ jQuery.indexedsearchAutocomplete = function(input, options) {
 		}
 	
 		if(theForm.is('FORM')) {
-			var doAutoSubmit = typeof cb_indexsearch_autocomplete !== 'undefined' && typeof cb_indexsearch_autocomplete.autoSubmit !== 'undefined' && cb_indexsearch_autocomplete.autoSubmit;
-			if (doAutoSubmit)
+			if (options.extensionConfig.autoSubmit)
 			{
 				jQuery(theForm).get(0).submit();
 			}
 		}
 	}
-	
+
 	function formatItem(row) {	
-		var label = typeof cb_indexsearch_autocomplete !== 'undefined' && typeof cb_indexsearch_autocomplete.altResultsLabel !== 'undefined' ? cb_indexsearch_autocomplete.altResultsLabel : 'results';
-		if(parseInt(row[1]) == 1) {
-			label = typeof cb_indexsearch_autocomplete !== 'undefined' && typeof cb_indexsearch_autocomplete.altResultLabel !== 'undefined' ? cb_indexsearch_autocomplete.altResultLabel : 'result';
-		}
-		return row[0] + " (" + row[1] + " " + label + ")";
+		var label = parseInt(row[1]) == 1 ? options.extensionConfig.altResultLabel : options.extensionConfig.altResultsLabel;
+		return row[0] + " (" + row[1] + (label ? " " + label : "") + ")";
 	}
 }
 
@@ -362,6 +376,12 @@ jQuery.fn.indexedsearchAutocomplete = function(url, options) {
 	options.loadingClass = options.loadingClass || "ac_loading";
 	options.selectFirst = options.selectFirst || false;
 	options.selectOnly = options.selectOnly || false;
+	options.extensionConfig = typeof cb_indexsearch_autocomplete !== 'undefined' && typeof cb_indexsearch_autocomplete === 'object' ? cb_indexsearch_autocomplete : {};
+	options.extensionConfig.altResultLabel = 'altResultLabel' in options.extensionConfig ? options.extensionConfig.altResultLabel : 'result';
+	options.extensionConfig.altResultsLabel = 'altResultsLabel' in options.extensionConfig ? options.extensionConfig.altResultsLabel : 'results';
+	options.extensionConfig.autoSubmit = 'autoSubmit' in options.extensionConfig ? options.extensionConfig.autoSubmit : false;
+	options.extensionConfig.maxResults = 'maxResults' in options.extensionConfig ? options.extensionConfig.maxResults : 2147483647;
+	options.extensionConfig.autoResize = 'autoResize' in options.extensionConfig ? options.extensionConfig.autoResize : false;
 
 	this.each(function() {
 		var input = this;

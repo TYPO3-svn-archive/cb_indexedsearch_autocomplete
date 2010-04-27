@@ -33,98 +33,113 @@
  * @subpackage    tx_cb_indexedsearch_autocomplete
  */
  
-class tx_cb_indexedsearch_autocomplete_pi1 {
-    
-    /**
-     * Hook from indexed_search
-     */
-    function initialize_postProc() {
-			
-			$on_search_page = 1;
-			
-			return $this->main($on_search_page);
+class tx_cb_indexedsearch_autocomplete_pi1
+{
+	/**
+	 * Hook from indexed_search
+	 */
+	function initialize_postProc()
+	{
+		$on_search_page = 1;
+		return $this->main($on_search_page);
+	}
+
+	/**
+	 * Add the Js and stylesheet
+	 */
+	function main($on_search_page = 0)
+	{
+		$this->key = 'cb_indexedsearch_autocomplete';
+
+		// alternative labels (waiting for real i18n support)
+		$altResultLabel = str_replace("'", "", $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['altResultLabel']);
+		$altResultsLabel = str_replace("'", "", $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['altResultsLabel']);
+
+		// Should we auto-submit the search form?
+		$autoSubmit = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['autoSubmit']);
+
+		// Which jQuery library should be loaded?
+		$jQueryFile = $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['jQueryFile'];
+
+		// Is jQuery already loaded externally?
+		$jQueryLoadedExternally = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['jQueryLoadedExternally']);
+
+		// Are the CSS definitions already loaded externally?
+		$cssLoadedExternally = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['cssLoadedExternally']);
+
+		// Supprt extension t3query for jQuery loadage
+		if (t3lib_extMgm::isLoaded('t3jquery'))
+		{
+			require_once(t3lib_extMgm::extPath('t3jquery').'class.tx_t3jquery.php');
 		}
-			
 
-    /**
-     * Add the Js and stylesheet
-     */
-    function main($on_search_page = 0) {
+		// Should we limit the result to a number of suggestions?
+		$maxResults = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['maxResults']);
 
-			$this->key = 'cb_indexedsearch_autocomplete';
+		// Shall we auto correct the lists width?
+		$autoResize = $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['autoResize'] ? 'true' : 'false';
 
-			// alternative labels (waiting for real i18n support)
-			$altResultLabel = str_replace("'", "", $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['altResultLabel']);
-			$altResultsLabel = str_replace("'", "", $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['altResultsLabel']);
+		// Should we run into jQuery noConflict Method? 
+		$noConflictMethod = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['noConflictMethod']);
 
-			// Should we auto-submit the search form?
-			$autoSubmit = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['autoSubmit']);
+		// Do we need this at all pages?
+		$onlySearchPage = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['onlySearchPage']);
 
-			// Which jQuery library should be loaded?
-			$jQueryFile = $GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['jQueryFile'];
-
-			// Is jQuery already loaded externally?
-			$jQueryLoadedExternally = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['jQueryLoadedExternally']);
-
-			// Should we limit the result to a number of suggestions?
-			$maxResults = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['maxResults']);
-
-			// Should we run into jQuery noConflict Method? 
-			$noConflictMethod = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['noConflictMethod']);
-
-			// Do we need this at all pages?
-			$onlySearchPage = intval($GLOBALS['TSFE']->tmpl->setup['plugin.'][$this->key . '.']['onlySearchPage']);
-			
-			if(intval($on_search_page) == 0 && $onlySearchPage != 0) {
-				return "";
-			}
-
-			$head = "";			
-
-			// No need to insert twice
-			if($GLOBALS[$this->key] != 1) {
-
-				// Include JS
-				if ($jQueryLoadedExternally === 0)
-				{
-					$jquery_filepath = str_replace('EXT:cb_indexedsearch_autocomplete/', t3lib_extMgm::siteRelPath($this->key), $jQueryFile);
-					$head .= "\n" . '<script type="text/javascript" src="' . $jquery_filepath . '"></script>';
-				}
-				$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.js"></script>';
-
-				// Include CSS
-				$head .= "\n" . '<link rel="stylesheet" type="text/css" href="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.css" />';
-
-				// Make rootpage global as we dont have it when we 'eId'. People can tamper with it client side, so we hash it, making it a little harder for them. It does not mean much they will not get access to more pages than they should anyways
-				$head .= "\n" . '<script type="text/javascript">' . "\n";
-				if ($noConflictMethod > 0)
-				{
-					$head .= "	jQuery.noConflict();\n";
-
-				}
-				$head .= '	var sr=' . intval($GLOBALS['TSFE']->config['rootLine'][0]['uid']) . ';var sh="' . t3lib_div::md5int($GLOBALS['TSFE']->config['rootLine'][0]['uid'] . $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey']) . '";' . "\n";
-				$head .= "	var cb_indexsearch_autocomplete = {\n";
-				$head .= "		altResultLabel: '$altResultLabel',\n";
-				$head .= "		altResultsLabel: '$altResultsLabel',\n";
-				$head .= "		autoSubmit: $autoSubmit,\n";
-				$head .= "		maxResults: $maxResults\n";
-				$head .= "	};\n";
-				$head .= "</script>\n";
-	
-				$GLOBALS['TSFE']->additionalHeaderData['tx_cb_indexedsearch_autocomplete_pi1'] = $head;
-				
-				// We have been here
-				$GLOBALS[$this->key] = 1;
-			}
-
+		if(intval($on_search_page) == 0 && $onlySearchPage != 0)
+		{
 			return '';
-    }
+		}
+
+		// No need to insert twice
+		if($GLOBALS[$this->key] != 1)
+		{
+			$head = '';
+			// Include JS
+			// load jQuery via t3jquery extension?
+			if (T3JQUERY === true)
+			{
+				tx_t3jquery::addJqJS();
+			}
+			else if (!$jQueryLoadedExternally)
+			{
+				$jquery_filepath = str_replace('EXT:cb_indexedsearch_autocomplete/', t3lib_extMgm::siteRelPath($this->key), $jQueryFile);
+				$head .= "\n" . '<script type="text/javascript" src="' . $jquery_filepath . '"></script>';
+			}
+			$head .= "\n" . '<script type="text/javascript" src="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.js"></script>';
+
+			// Include CSS
+			if (!$cssLoadedExternally)
+			{
+				$head .= "\n" . '<link rel="stylesheet" type="text/css" href="' . t3lib_extMgm::siteRelPath($this->key) . 'res/cb_indexedsearch_autocomplete.css" />';
+			}
+
+			// Make rootpage global as we dont have it when we 'eId'. People can tamper with it client side, so we hash it, making it a little harder for them. It does not mean much they will not get access to more pages than they should anyways
+			$head .= "\n" . '<script type="text/javascript">' . "\n";
+			if ($noConflictMethod > 0)
+			{
+				$head .= "	jQuery.noConflict();\n";
+			}
+			$head .= '	var sr=' . intval($GLOBALS['TSFE']->config['rootLine'][0]['uid']) . ';var sh="' . t3lib_div::md5int($GLOBALS['TSFE']->config['rootLine'][0]['uid'] . $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey']) . '";' . "\n";
+			$head .= "	var cb_indexsearch_autocomplete = {\n";
+			$head .= "		altResultLabel: '$altResultLabel',\n";
+			$head .= "		altResultsLabel: '$altResultsLabel',\n";
+			$head .= "		autoSubmit: $autoSubmit,\n";
+			$head .= "		maxResults: $maxResults,\n";
+			$head .= "		autoResize: $autoResize\n";
+			$head .= "	};\n";
+			$head .= "</script>\n";
+
+			$GLOBALS['TSFE']->additionalHeaderData['tx_cb_indexedsearch_autocomplete_pi1'] = $head;
+			
+			// We have been here
+			$GLOBALS[$this->key] = 1;
+		}
+		return '';
+	}
 }
 
-
-
 if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/cb_indexedsearch_autocomplete/pi1/class.tx_cb_indexedsearch_autocomplete_pi1.php'])    {
-    include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/cb_indexedsearch_autocomplete/pi1/class.tx_cb_indexedsearch_autocomplete_pi1.php']);
+	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/cb_indexedsearch_autocomplete/pi1/class.tx_cb_indexedsearch_autocomplete_pi1.php']);
 }
 
 ?>

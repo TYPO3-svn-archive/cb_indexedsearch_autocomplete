@@ -1,6 +1,6 @@
 .ac_results {
+	background: #F5F5F5;
 	width: 200px; /* This value is set in the javascript code, to match the width of the search box */
-	background: #f5f5f5;
 	cursor: pointer;
 	position: absolute;
 	left: 0;
@@ -12,17 +12,24 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
-	border: 1px solid #aaa;
+	border: 1px solid #AAAAAA;
 }
-.ac_results iframe
-{
+
+.ac_results ul li.even {
+	background: #E5E5E5;
+}
+
+.ac_results ul li.odd {
+	background: #FFFFFF;
+}
+
+.ac_results iframe {
 	display:none;/*sorry for IE5*/
 	display/**/:block;/*sorry for IE5*/
 	position:absolute;
 	top:0;
 	left:0;
 	z-index:-1;
-	filter:mask();
 }
 .ac_results li {
 	padding: 2px 5px;
@@ -31,11 +38,8 @@
 	width: 100%;
 }
 .ac_loading {
-	background:url('../img/indicator.gif') right center no-repeat;
+	background:#FFFFFF url('../img/indicator.gif') no-repeat right center;
 }
 .over {
-	background: #abb;
-	color:white;
-	font-weight:bold;
+	background-color: #A7CDF0 !important;
 }
-
