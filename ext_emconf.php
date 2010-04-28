@@ -42,7 +42,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'suggests' => array(
 		),
 	),
-	'_md5_values_when_last_written' => 'a:12:{s:12:"ext_icon.gif";s:4:"4cf1";s:17:"ext_localconf.php";s:4:"28cc";s:14:"ext_tables.php";s:4:"1af4";s:14:"doc/manual.sxw";s:4:"0a6e";s:17:"img/indicator.gif";s:4:"03ce";s:50:"pi1/class.tx_cb_indexedsearch_autocomplete_pi1.php";s:4:"7acb";s:16:"pi1/fe_index.php";s:4:"0c44";s:37:"res/cb_indexedsearch_autocomplete.css";s:4:"74d9";s:36:"res/cb_indexedsearch_autocomplete.js";s:4:"ef15";s:25:"res/jquery-latest.pack.js";s:4:"9eb3";s:23:"static/ts/constants.txt";s:4:"473f";s:19:"static/ts/setup.txt";s:4:"d333";}',
+	'_md5_values_when_last_written' => 'a:12:{s:12:"ext_icon.gif";s:4:"4cf1";s:17:"ext_localconf.php";s:4:"28cc";s:14:"ext_tables.php";s:4:"1af4";s:14:"doc/manual.sxw";s:4:"8303";s:17:"img/indicator.gif";s:4:"03ce";s:50:"pi1/class.tx_cb_indexedsearch_autocomplete_pi1.php";s:4:"7acb";s:16:"pi1/fe_index.php";s:4:"0c44";s:37:"res/cb_indexedsearch_autocomplete.css";s:4:"74d9";s:36:"res/cb_indexedsearch_autocomplete.js";s:4:"ef15";s:25:"res/jquery-latest.pack.js";s:4:"9eb3";s:23:"static/ts/constants.txt";s:4:"473f";s:19:"static/ts/setup.txt";s:4:"d333";}',
 	'suggests' => array(
 	),
 );
