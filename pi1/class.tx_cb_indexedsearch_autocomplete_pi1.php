@@ -115,7 +115,7 @@ class tx_cb_indexedsearch_autocomplete_pi1
 
 			// Make rootpage global as we dont have it when we 'eId'. People can tamper with it client side, so we hash it, making it a little harder for them. It does not mean much they will not get access to more pages than they should anyways
 			$head .= "\n" . '<script type="text/javascript">' . "\n";
-			if ($noConflictMethod > 0)
+			if (($noConflictMethod > 0) && (T3JQUERY !== true))
 			{
 				$head .= "	jQuery.noConflict();\n";
 			}
