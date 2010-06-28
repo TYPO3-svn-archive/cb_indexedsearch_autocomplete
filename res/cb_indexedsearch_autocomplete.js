@@ -393,6 +393,6 @@ jQuery.fn.indexedsearchAutocomplete = function(url, options) {
 }
 
 jQuery(document).ready(function() {
-	jQuery("input[name='tx_indexedsearch[sword]']").indexedsearchAutocomplete("http://" + top.location.host + top.location.pathname + "?eID=cb_indexedsearch_autocomplete&sr=" + sr + "&sh=" + sh + "", { minChars:3, matchSubset:1, matchContains:1, cacheLength:10, selectOnly:1 });
+	jQuery("input[name='tx_indexedsearch[sword]']").indexedsearchAutocomplete(top.location.protocol + "//" + top.location.host + top.location.pathname + "?eID=cb_indexedsearch_autocomplete&sr=" + sr + "&sh=" + sh + "", { minChars:3, matchSubset:1, matchContains:1, cacheLength:10, selectOnly:1 });
 });
 
